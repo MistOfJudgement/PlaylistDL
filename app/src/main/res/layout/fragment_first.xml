@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".FirstFragment">
+
+    <EditText
+        android:id="@+id/playlisturl"
+        android:layout_width="235dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="36dp"
+        android:autoLink="web"
+        android:autofillHints=""
+        android:ems="10"
+        android:hint="@string/url_hint"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.194"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="99dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="20dp"
+        android:text="@string/url_check"
+        app:layout_constraintBottom_toBottomOf="@+id/playlisturl"
+        app:layout_constraintStart_toEndOf="@+id/playlisturl"
+        app:layout_constraintTop_toTopOf="@+id/playlisturl" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="0dp"
+        android:layout_height="173dp"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="@+id/button"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/playlisturl"
+        app:layout_constraintTop_toBottomOf="@+id/playlisturl" />
+</androidx.constraintlayout.widget.ConstraintLayout>
