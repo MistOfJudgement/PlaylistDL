@@ -1,11 +1,15 @@
 package com.mistofjudgement.playlistdl;
 
+import android.database.Observable;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Debug;
 import android.util.Log;
 import android.view.View;
 
@@ -18,10 +22,16 @@ import com.mistofjudgement.playlistdl.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.yausername.ffmpeg.FFmpeg;
 import com.yausername.youtubedl_android.YoutubeDL;
 import com.yausername.youtubedl_android.YoutubeDLException;
+import com.yausername.youtubedl_android.YoutubeDLOptions;
+import com.yausername.youtubedl_android.YoutubeDLRequest;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (YoutubeDLException ex) {
             Log.e(TAG, "failed to init youtubedl android", ex);
         }
+
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -64,7 +75,28 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
+    private boolean updating = false;
+    public void updateYTDL() {
+        if(updating) {
+            Toast.makeText(MainActivity.this, "Already updating idot", Toast.LENGTH_LONG).show();
+            return;
+        }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            updating = true;
+            Executors.newSingleThreadExecutor().execute(() -> {
+                try {
+                    Log.i(TAG, "Started Download");
+                    YoutubeDL.getInstance().updateYoutubeDL(this, YoutubeDL.UpdateChannel._STABLE);
+                    Log.i(TAG, "Done Download");
+                } catch (YoutubeDLException e) {
+                    e.printStackTrace();
+                }
+
+                updating = false;
+            });
+        }
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -73,7 +105,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.updateButton) {
+            updateYTDL();
             return true;
         }
 

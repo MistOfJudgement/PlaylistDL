@@ -34,10 +34,14 @@ import com.yausername.youtubedl_android.YoutubeDLRequest;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.IntFunction;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function3;
 
 public class FirstFragment extends Fragment {
 
@@ -61,6 +65,14 @@ public class FirstFragment extends Fragment {
                 }
             });
 
+    private final Function3<Float, Long, String, Unit> callback = (progress, etaInSeconds, line) -> {
+        this.requireActivity().runOnUiThread(() -> {
+            Log.i(MainActivity.TAG, line);
+            binding.status.setText(String.format(Locale.US, "%.2f%% %d seconds left\n%s", progress, etaInSeconds, line));
+
+        });
+        return Unit.INSTANCE;
+    };
     private Handler handler;
     private Executor executor;
     @Override
@@ -136,9 +148,10 @@ public class FirstFragment extends Fragment {
 //        File config = new File(dldir, "config.txt");
         req.addOption("--no-mtime");
         req.addOption("-x");
+        req.addOption("--audio-format", "mp3");
         req.addOption("--embed-thumbnail");
         req.addOption("--embed-metadata");
-        req.addOption("--audio-format", "mp3");
+        req.addOption("--rm-cache-dir");
 //        req.addOption("-f", "bestaudio[ext=mp4]");
         req.addOption("-o", dldir.getAbsolutePath() + "/%(title)s.%(ext)s");
 
@@ -146,14 +159,8 @@ public class FirstFragment extends Fragment {
         executor.execute(() -> {
             try {
 
-                YoutubeDL.getInstance().execute(req, (progress, etaInSeconds, line) -> {
-                    this.requireActivity().runOnUiThread(() -> {
-                        Log.i(MainActivity.TAG, line);
-                        binding.status.setText(String.format("%.2f%% %d seconds left\n%s", progress, etaInSeconds, line));
-
-                    });
-                });
-            } catch (YoutubeDLException | InterruptedException e) {
+                YoutubeDL.getInstance().execute(req,"PlaylistDL", callback);
+            } catch (YoutubeDLException | InterruptedException | YoutubeDL.CanceledException e) {
                 e.printStackTrace();
             }
             String[] paths = new String[dldir.list().length];
